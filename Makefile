@@ -21,7 +21,28 @@ MODULES=ttq.erl ttq_eqc.erl
 all: test_report.txt ${DIALYZER_RESULT}
 
 test_report.txt: ${MODULES:.erl=.beam}
-	${ERL} ${ERLFLAGS} -noshell -eval 'proper:check_specs(ttq), proper:module(ttq_eqc), init:stop().' |tee $@
+	@echo Running PropEr
+	@${ERL} ${ERLFLAGS} -noshell -eval ' \
+		{ok, F} = file:open("$@", [write]), \
+		Failed_Spec_Cases = proper:check_specs(ttq, [{to_file, F}, long_result]), \
+		Failed_Property_Cases = proper:module(ttq_eqc, [{to_file, F}, long_result]), \
+		ok = file:close(F), \
+		Status = case {Failed_Spec_Cases, Failed_Property_Cases} of \
+			{[], []} -> \
+				0; \
+			{Failed_Spec_Cases, []} -> \
+				io:format("Failed proper:check_specs: ~p~n", [Failed_Spec_Cases]), \
+				1; \
+			{[], Failed_Property_Cases} -> \
+				io:format("Failed proper:module: ~p~n", [Failed_Property_Cases]), \
+				1; \
+			{Failed_Spec_Cases, Failed_Property_Cases} -> \
+				io:format("Failed proper:check_specs: ~p~n", [Failed_Spec_Cases]), \
+				io:format("Failed proper:module: ~p~n", [Failed_Property_Cases]), \
+				1 \
+		end, \
+		halt(Status). \
+	'
 
 ${DIALYZER_RESULT}: ${DIALYZER_PLT} ${MODULES:.erl=.beam}
 	dialyzer --no_check_plt --plt ${DIALYZER_PLT} --output $@ --apps .
@@ -33,7 +54,7 @@ ${DIALYZER_PLT}:
 	dialyzer --build_plt --output_plt $@ --apps erts kernel stdlib compiler crypto ${PROPER}/ebin
 
 clean:
-	rm -f *.beam test_report.txt ${DIALYZER_RESULT} erl_crash.dump
+	rm -f ${MODULES:.erl=.beam} test_report.txt ${DIALYZER_RESULT} erl_crash.dump
 
 nuke: clean
 	rm -f ${DIALYZER_PLT}
