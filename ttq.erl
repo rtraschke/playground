@@ -2,10 +2,7 @@
 
 -export([add_offset/2, is_earlier_or_equal/2]).
 
-% timestamp is {MegaSecs, Secs, MicroSecs} as elapsed time since 00:00 GMT, January 1, 1970 (zero hour)
--type timestamp() :: {non_neg_integer(), non_neg_integer(), non_neg_integer()}.  % {MegaSecs, Secs, MicroSecs}
--type offset_ms() :: non_neg_integer().  % MilliSecs
-
+-include("ttq.hrl").
 
 -spec ttq:add_offset(timestamp(), offset_ms()) -> timestamp().
 add_offset({MegaSecs, Secs, MicroSecs}, MilliSecs) when MilliSecs >= 0 ->

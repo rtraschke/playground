@@ -2,29 +2,31 @@
 
 -compile([export_all]).
 
+-include("ttq.hrl").
+
 -include_lib("proper.hrl").
 
+% The properties for the timestamp operations:
+
+ts_to_micro({Mega, Secs, Micro}) ->
+	(((Mega * 1000000) + Secs) * 1000000) + Micro.
+
 prop_add_offset() ->
-	?FORALL({TS, OFF}, {{integer(0, 999999), integer(0, 999999), integer(0, 999999)},integer(0, 999999)},
+	?FORALL({TS, OFF}, {timestamp(), offset_ms()},
 	begin
-		{Mega1, Secs1, Micro1} = TS,
-		{Mega2, Secs2, Micro2} = ttq:add_offset(TS, OFF),
-		(((Mega1*1000000)+Secs1)*1000000)+Micro1+(OFF*1000)
-			=:= (((Mega2*1000000)+Secs2)*1000000)+Micro2
+		( ts_to_micro(TS) + (OFF * 1000) ) =:= ts_to_micro(ttq:add_offset(TS, OFF))
 	end).
 
 prop_is_earlier_or_equal() ->
-	?FORALL({T1, T2}, {{integer(0, 999999), integer(0, 999999), integer(0, 999999)},
-			{integer(0, 999999), integer(0, 999999), integer(0, 999999)}},
+	?FORALL({T1, T2}, {timestamp(), timestamp()},
 	begin
-		{Mega1, Secs1, Micro1} = T1,
-		{Mega2, Secs2, Micro2} = T2,
-		( (((Mega1*1000000)+Secs1)*1000000)+Micro1 =< (((Mega2*1000000)+Secs2)*1000000)+Micro2 )
-			=:= ttq:is_earlier_or_equal(T1, T2)
+		( ts_to_micro(T1) =< ts_to_micro(T2) ) =:= ttq:is_earlier_or_equal(T1, T2)
 	end).
 
 
 -ifdef(false).
+
+% The properties modelling the queue:
 
 -record(state, {ttq, model}).
 

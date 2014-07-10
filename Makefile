@@ -26,6 +26,9 @@ test_report.txt: ${MODULES:.erl=.beam}
 ${DIALYZER_RESULT}: ${DIALYZER_PLT} ${MODULES:.erl=.beam}
 	dialyzer --no_check_plt --plt ${DIALYZER_PLT} --output $@ --apps .
 
+
+${MODULES:.erl=.beam}: ttq.hrl
+
 ${DIALYZER_PLT}:
 	dialyzer --build_plt --output_plt $@ --apps erts kernel stdlib compiler crypto ${PROPER}/ebin
 
