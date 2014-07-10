@@ -36,4 +36,4 @@ clean:
 	rm -f *.beam test_report.txt ${DIALYZER_RESULT} erl_crash.dump
 
 nuke: clean
-	rm ${DIALYZER_PLT}
+	rm -f ${DIALYZER_PLT}
