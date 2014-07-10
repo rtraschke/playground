@@ -7,7 +7,7 @@
 -type offset_ms() :: non_neg_integer().  % MilliSecs
 
 
--spec teatime:add_offset(timestamp(), offset_ms()) -> timestamp().
+-spec ttq:add_offset(timestamp(), offset_ms()) -> timestamp().
 add_offset({MegaSecs, Secs, MicroSecs}, MilliSecs) when MilliSecs >= 0 ->
 	TotMicroSecs = MicroSecs + 1000*MilliSecs,
 	NewMicroSecs = TotMicroSecs rem 1000000,
@@ -16,7 +16,7 @@ add_offset({MegaSecs, Secs, MicroSecs}, MilliSecs) when MilliSecs >= 0 ->
 	NewMegaSecs = MegaSecs + (TotSecs div 1000000),
 	{NewMegaSecs, NewSecs, NewMicroSecs}.
 
--spec teatime:is_earlier_or_equal(timestamp(), timestamp()) -> boolean().
+-spec ttq:is_earlier_or_equal(timestamp(), timestamp()) -> boolean().
 is_earlier_or_equal(T1, T2) ->
 	timer:now_diff(T2, T1) >= 0.
 
