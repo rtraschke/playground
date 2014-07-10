@@ -33,8 +33,7 @@ ${DIALYZER_PLT}:
 	dialyzer --build_plt --output_plt $@ --apps erts kernel stdlib compiler crypto ${PROPER}/ebin
 
 clean:
-	rm *.beam
-	rm test_report.txt
+	rm -f *.beam test_report.txt ${DIALYZER_RESULT} erl_crash.dump
 
 nuke: clean
 	rm ${DIALYZER_PLT}
